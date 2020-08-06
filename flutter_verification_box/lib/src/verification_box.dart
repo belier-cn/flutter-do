@@ -11,7 +11,7 @@ import 'package:flutter_verification_box/src/verification_box_item.dart';
 class VerificationBox extends StatefulWidget {
   VerificationBox(
       {this.count = 6,
-      this.itemWidget = 45,
+      this.itemWidth = 45,
       this.onSubmitted,
       this.type = VerificationBoxItemType.box,
       this.decoration,
@@ -26,7 +26,8 @@ class VerificationBox extends StatefulWidget {
       this.cursorWidth = 2,
       this.cursorColor,
       this.cursorIndent = 10,
-      this.cursorEndIndent = 10});
+      this.cursorEndIndent = 10,
+      this.onChange});
 
   ///
   /// 几位验证码，一般6位，还有4位的
@@ -36,12 +37,17 @@ class VerificationBox extends StatefulWidget {
   ///
   /// 没一个item的宽
   ///
-  final double itemWidget;
+  final double itemWidth;
 
   ///
   /// 输入完成回调
   ///
   final ValueChanged onSubmitted;
+
+  ///
+  /// 值改变的回调
+  ///
+  final ValueChanged onChange;
 
   ///
   /// 每个item的装饰类型，[VerificationBoxItemType]
@@ -137,6 +143,7 @@ class _VerificationBox extends State<VerificationBox> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: () {
         FocusScope.of(context).requestFocus(_focusNode);
       },
@@ -145,30 +152,31 @@ class _VerificationBox extends State<VerificationBox> {
           _buildTextField(),
           Positioned.fill(
               child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: List.generate(widget.count, (index) {
-              return Container(
-                width: widget.itemWidget,
-                child: VerificationBoxItem(
-                  data: _contentList[index],
-                  textStyle: widget.textStyle,
-                  type: widget.type,
-                  decoration: widget.decoration,
-                  borderRadius: widget.borderRadius,
-                  borderWidth: widget.borderWidth,
-                  borderColor: (_controller.text.length == index
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: List.generate(widget.count, (index) {
+                  return Container(
+                    width: widget.itemWidth,
+                    child: VerificationBoxItem(
+                      data: _contentList[index],
+                      textStyle: widget.textStyle,
+                      type: widget.type,
+                      decoration: widget.decoration,
+                      borderRadius: widget.borderRadius,
+                      borderWidth: widget.borderWidth,
+                      borderColor: (_controller.text.length == index
                           ? widget.focusBorderColor
                           : widget.borderColor) ??
-                      widget.borderColor,
-                  showCursor: widget.showCursor && _controller.text.length == index,
-                  cursorColor: widget.cursorColor,
-                  cursorWidth: widget.cursorWidth,
-                  cursorIndent: widget.cursorIndent,
-                  cursorEndIndent: widget.cursorEndIndent,
-                ),
-              );
-            }),
-          )),
+                          widget.borderColor,
+                      showCursor:
+                      widget.showCursor && _controller.text.length == index,
+                      cursorColor: widget.cursorColor,
+                      cursorWidth: widget.cursorWidth,
+                      cursorIndent: widget.cursorIndent,
+                      cursorEndIndent: widget.cursorEndIndent,
+                    ),
+                  );
+                }),
+              )),
         ],
       ),
     );
@@ -217,6 +225,11 @@ class _VerificationBox extends State<VerificationBox> {
         _contentList[i] = '';
       }
     }
+
+    if (widget.onChange != null) {
+      widget.onChange(value);
+    }
+
     setState(() {});
 
     if (value.length == widget.count) {
