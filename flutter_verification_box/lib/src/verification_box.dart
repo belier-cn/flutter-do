@@ -20,7 +20,7 @@ class VerificationBox extends StatefulWidget {
       this.textStyle,
       this.focusBorderColor,
       this.borderColor,
-      this.unfocus = true,
+      this.unFocus = true,
       this.autoFocus = true,
       this.showCursor = false,
       this.cursorWidth = 2,
@@ -87,7 +87,7 @@ class VerificationBox extends StatefulWidget {
   ///
   /// 输入完成后是否失去焦点，默认true，失去焦点后，软键盘消失
   ///
-  final bool unfocus;
+  final bool unFocus;
 
   ///
   /// 是否自动获取焦点
@@ -130,6 +130,9 @@ class _VerificationBox extends State<VerificationBox> {
 
   List _contentList = [];
 
+  final GlobalKey<EditableTextState> editableTextKey =
+  GlobalKey<EditableTextState>();
+
   @override
   void initState() {
     List.generate(widget.count, (index) {
@@ -146,37 +149,39 @@ class _VerificationBox extends State<VerificationBox> {
       behavior: HitTestBehavior.opaque,
       onTap: () {
         FocusScope.of(context).requestFocus(_focusNode);
+        editableTextKey.currentState?.requestKeyboard();
       },
       child: Stack(
         children: <Widget>[
           _buildTextField(),
           Positioned.fill(
-              child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: List.generate(widget.count, (index) {
-              return Container(
-                width: widget.itemWidth,
-                child: VerificationBoxItem(
-                  data: _contentList[index],
-                  textStyle: widget.textStyle,
-                  type: widget.type,
-                  decoration: widget.decoration,
-                  borderRadius: widget.borderRadius,
-                  borderWidth: widget.borderWidth,
-                  borderColor: (_controller.text.length == index
-                          ? widget.focusBorderColor
-                          : widget.borderColor) ??
-                      widget.borderColor,
-                  showCursor:
-                      widget.showCursor && _controller.text.length == index,
-                  cursorColor: widget.cursorColor,
-                  cursorWidth: widget.cursorWidth,
-                  cursorIndent: widget.cursorIndent,
-                  cursorEndIndent: widget.cursorEndIndent,
-                ),
-              );
-            }),
-          )),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: List.generate(widget.count, (index) {
+                return Container(
+                  width: widget.itemWidth,
+                  child: VerificationBoxItem(
+                    data: _contentList[index],
+                    textStyle: widget.textStyle,
+                    type: widget.type,
+                    decoration: widget.decoration,
+                    borderRadius: widget.borderRadius,
+                    borderWidth: widget.borderWidth,
+                    borderColor: (_controller.text.length == index
+                        ? widget.focusBorderColor
+                        : widget.borderColor) ??
+                        widget.borderColor,
+                    showCursor:
+                    widget.showCursor && _controller.text.length == index,
+                    cursorColor: widget.cursorColor,
+                    cursorWidth: widget.cursorWidth,
+                    cursorIndent: widget.cursorIndent,
+                    cursorEndIndent: widget.cursorEndIndent,
+                  ),
+                );
+              }),
+            ),
+          ),
         ],
       ),
     );
@@ -186,34 +191,20 @@ class _VerificationBox extends State<VerificationBox> {
   /// 构建TextField
   ///
   _buildTextField() {
-    return TextField(
+    return EditableText(
+      key: editableTextKey,
       controller: _controller,
       focusNode: _focusNode,
-      decoration: InputDecoration(
-        border: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.transparent)),
-        enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.transparent)),
-        focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.transparent)),
-      ),
       cursorWidth: 0,
       autofocus: widget.autoFocus,
       inputFormatters: [
         WhitelistingTextInputFormatter(RegExp("[0-9]")),
       ],
-      maxLength: widget.count,
-      buildCounter: (
-        BuildContext context, {
-        int currentLength,
-        int maxLength,
-        bool isFocused,
-      }) {
-        return Text('');
-      },
       keyboardType: TextInputType.number,
       style: TextStyle(color: Colors.transparent),
       onChanged: _onValueChange,
+      cursorColor: Colors.transparent,
+      backgroundCursorColor: Colors.transparent,
     );
   }
 
@@ -233,7 +224,7 @@ class _VerificationBox extends State<VerificationBox> {
     setState(() {});
 
     if (value.length == widget.count) {
-      if (widget.unfocus) {
+      if (widget.unFocus) {
         _focusNode.unfocus();
       }
       if (widget.onSubmitted != null) {
