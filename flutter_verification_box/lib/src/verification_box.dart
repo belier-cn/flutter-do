@@ -131,7 +131,7 @@ class _VerificationBox extends State<VerificationBox> {
   List _contentList = [];
 
   final GlobalKey<EditableTextState> editableTextKey =
-  GlobalKey<EditableTextState>();
+      GlobalKey<EditableTextState>();
 
   @override
   void initState() {
@@ -141,6 +141,12 @@ class _VerificationBox extends State<VerificationBox> {
     _controller = TextEditingController();
     _focusNode = FocusNode();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _focusNode?.dispose();
+    super.dispose();
   }
 
   @override
