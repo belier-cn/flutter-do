@@ -131,7 +131,7 @@ class _VerificationBox extends State<VerificationBox> {
   List _contentList = [];
 
   final GlobalKey<EditableTextState> editableTextKey =
-      GlobalKey<EditableTextState>();
+  GlobalKey<EditableTextState>();
 
   @override
   void initState() {
@@ -204,7 +204,8 @@ class _VerificationBox extends State<VerificationBox> {
       cursorWidth: 0,
       autofocus: widget.autoFocus,
       inputFormatters: [
-        WhitelistingTextInputFormatter(RegExp("[0-9]")),
+        WhitelistingTextInputFormatter.digitsOnly,
+        LengthLimitingTextInputFormatter(widget.count),
       ],
       keyboardType: TextInputType.number,
       style: TextStyle(color: Colors.transparent),
@@ -215,26 +216,24 @@ class _VerificationBox extends State<VerificationBox> {
   }
 
   _onValueChange(value) {
+    String text = _controller.text;
+
     for (int i = 0; i < widget.count; i++) {
-      if (i < value.length) {
-        _contentList[i] = value.substring(i, i + 1);
-      } else {
-        _contentList[i] = '';
-      }
+      _contentList[i] = i < value.length ? text.substring(i, i + 1) : "";
     }
 
     if (widget.onChange != null) {
-      widget.onChange(value);
+      widget.onChange(text);
     }
 
     setState(() {});
 
-    if (value.length == widget.count) {
+    if (text.length == widget.count) {
       if (widget.unfocus) {
         _focusNode.unfocus();
       }
       if (widget.onSubmitted != null) {
-        widget.onSubmitted(value);
+        widget.onSubmitted(text);
       }
     }
   }
