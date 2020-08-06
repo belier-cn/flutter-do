@@ -20,7 +20,7 @@ class VerificationBox extends StatefulWidget {
       this.textStyle,
       this.focusBorderColor,
       this.borderColor,
-      this.unFocus = true,
+      this.unfocus = true,
       this.autoFocus = true,
       this.showCursor = false,
       this.cursorWidth = 2,
@@ -87,7 +87,7 @@ class VerificationBox extends StatefulWidget {
   ///
   /// 输入完成后是否失去焦点，默认true，失去焦点后，软键盘消失
   ///
-  final bool unFocus;
+  final bool unfocus;
 
   ///
   /// 是否自动获取焦点
@@ -224,7 +224,7 @@ class _VerificationBox extends State<VerificationBox> {
     setState(() {});
 
     if (value.length == widget.count) {
-      if (widget.unFocus) {
+      if (widget.unfocus) {
         _focusNode.unfocus();
       }
       if (widget.onSubmitted != null) {
