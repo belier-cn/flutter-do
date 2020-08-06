@@ -42,12 +42,12 @@ class VerificationBox extends StatefulWidget {
   ///
   /// 输入完成回调
   ///
-  final ValueChanged onSubmitted;
+  final ValueChanged<String> onSubmitted;
 
   ///
   /// 值改变的回调
   ///
-  final ValueChanged onChange;
+  final ValueChanged<String> onChange;
 
   ///
   /// 每个item的装饰类型，[VerificationBoxItemType]
@@ -152,31 +152,31 @@ class _VerificationBox extends State<VerificationBox> {
           _buildTextField(),
           Positioned.fill(
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: List.generate(widget.count, (index) {
-                  return Container(
-                    width: widget.itemWidth,
-                    child: VerificationBoxItem(
-                      data: _contentList[index],
-                      textStyle: widget.textStyle,
-                      type: widget.type,
-                      decoration: widget.decoration,
-                      borderRadius: widget.borderRadius,
-                      borderWidth: widget.borderWidth,
-                      borderColor: (_controller.text.length == index
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: List.generate(widget.count, (index) {
+              return Container(
+                width: widget.itemWidth,
+                child: VerificationBoxItem(
+                  data: _contentList[index],
+                  textStyle: widget.textStyle,
+                  type: widget.type,
+                  decoration: widget.decoration,
+                  borderRadius: widget.borderRadius,
+                  borderWidth: widget.borderWidth,
+                  borderColor: (_controller.text.length == index
                           ? widget.focusBorderColor
                           : widget.borderColor) ??
-                          widget.borderColor,
-                      showCursor:
+                      widget.borderColor,
+                  showCursor:
                       widget.showCursor && _controller.text.length == index,
-                      cursorColor: widget.cursorColor,
-                      cursorWidth: widget.cursorWidth,
-                      cursorIndent: widget.cursorIndent,
-                      cursorEndIndent: widget.cursorEndIndent,
-                    ),
-                  );
-                }),
-              )),
+                  cursorColor: widget.cursorColor,
+                  cursorWidth: widget.cursorWidth,
+                  cursorIndent: widget.cursorIndent,
+                  cursorEndIndent: widget.cursorEndIndent,
+                ),
+              );
+            }),
+          )),
         ],
       ),
     );
