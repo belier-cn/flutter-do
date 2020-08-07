@@ -9,25 +9,27 @@ import 'package:flutter_verification_box/src/verification_box_item.dart';
 /// 验证码输入框
 ///
 class VerificationBox extends StatefulWidget {
-  VerificationBox(
-      {this.count = 6,
-      this.itemWidth = 45,
-      this.onSubmitted,
-      this.type = VerificationBoxItemType.box,
-      this.decoration,
-      this.borderWidth = 2.0,
-      this.borderRadius = 5.0,
-      this.textStyle,
-      this.focusBorderColor,
-      this.borderColor,
-      this.unfocus = true,
-      this.autoFocus = true,
-      this.showCursor = false,
-      this.cursorWidth = 2,
-      this.cursorColor,
-      this.cursorIndent = 10,
-      this.cursorEndIndent = 10,
-      this.onChange});
+  VerificationBox({
+    Key key,
+    this.count = 6,
+    this.itemWidth = 45,
+    this.onSubmitted,
+    this.type = VerificationBoxItemType.box,
+    this.decoration,
+    this.borderWidth = 2.0,
+    this.borderRadius = 5.0,
+    this.textStyle,
+    this.focusBorderColor,
+    this.borderColor,
+    this.unfocus = true,
+    this.autoFocus = true,
+    this.showCursor = false,
+    this.cursorWidth = 2,
+    this.cursorColor,
+    this.cursorIndent = 10,
+    this.cursorEndIndent = 10,
+    this.onChange,
+  }) : super(key: key);
 
   ///
   /// 几位验证码，一般6位，还有4位的
@@ -120,23 +122,45 @@ class VerificationBox extends StatefulWidget {
   final double cursorEndIndent;
 
   @override
-  State<StatefulWidget> createState() => _VerificationBox();
+  State<StatefulWidget> createState() => VerificationBoxState();
 }
 
-class _VerificationBox extends State<VerificationBox> {
+class VerificationBoxState extends State<VerificationBox> {
   TextEditingController _controller;
 
   FocusNode _focusNode;
 
   List _contentList = [];
 
-  final GlobalKey<EditableTextState> editableTextKey =
-  GlobalKey<EditableTextState>();
+  final GlobalKey<EditableTextState> _editableTextKey =
+      GlobalKey<EditableTextState>();
+
+  GlobalKey<EditableTextState> get editableTextKey => _editableTextKey;
+
+  FocusNode get focusNode => _focusNode;
+
+  String get value => _controller.text;
+
+  clearValue() {
+    // 判断 value 是否为空
+    if (value == "") {
+      return;
+    }
+    _contentList = [];
+    List.generate(widget.count, (index) {
+      _contentList.add("");
+    });
+    _controller.text = "";
+    if (widget.onChange != null) {
+      widget.onChange(value);
+    }
+    setState(() {});
+  }
 
   @override
   void initState() {
     List.generate(widget.count, (index) {
-      _contentList.add('');
+      _contentList.add("");
     });
     _controller = TextEditingController();
     _focusNode = FocusNode();
@@ -155,40 +179,43 @@ class _VerificationBox extends State<VerificationBox> {
       behavior: HitTestBehavior.opaque,
       onTap: () {
         FocusScope.of(context).requestFocus(_focusNode);
-        editableTextKey.currentState?.requestKeyboard();
+        _editableTextKey.currentState?.requestKeyboard();
       },
       child: Stack(
         children: <Widget>[
           _buildTextField(),
-          Positioned.fill(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: List.generate(widget.count, (index) {
-                return Container(
-                  width: widget.itemWidth,
-                  child: VerificationBoxItem(
-                    data: _contentList[index],
-                    textStyle: widget.textStyle,
-                    type: widget.type,
-                    decoration: widget.decoration,
-                    borderRadius: widget.borderRadius,
-                    borderWidth: widget.borderWidth,
-                    borderColor: (_controller.text.length == index
-                        ? widget.focusBorderColor
-                        : widget.borderColor) ??
-                        widget.borderColor,
-                    showCursor:
-                    widget.showCursor && _controller.text.length == index,
-                    cursorColor: widget.cursorColor,
-                    cursorWidth: widget.cursorWidth,
-                    cursorIndent: widget.cursorIndent,
-                    cursorEndIndent: widget.cursorEndIndent,
-                  ),
-                );
-              }),
-            ),
-          ),
+          _buildBox(),
         ],
+      ),
+    );
+  }
+
+  Widget _buildBox() {
+    return Positioned.fill(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: List.generate(widget.count, (index) {
+          return Container(
+            width: widget.itemWidth,
+            child: VerificationBoxItem(
+              data: _contentList[index],
+              textStyle: widget.textStyle,
+              type: widget.type,
+              decoration: widget.decoration,
+              borderRadius: widget.borderRadius,
+              borderWidth: widget.borderWidth,
+              borderColor: (_controller.text.length == index
+                  ? widget.focusBorderColor
+                  : widget.borderColor) ??
+                  widget.borderColor,
+              showCursor: widget.showCursor && _controller.text.length == index,
+              cursorColor: widget.cursorColor,
+              cursorWidth: widget.cursorWidth,
+              cursorIndent: widget.cursorIndent,
+              cursorEndIndent: widget.cursorEndIndent,
+            ),
+          );
+        }),
       ),
     );
   }
@@ -198,7 +225,7 @@ class _VerificationBox extends State<VerificationBox> {
   ///
   _buildTextField() {
     return EditableText(
-      key: editableTextKey,
+      key: _editableTextKey,
       controller: _controller,
       focusNode: _focusNode,
       cursorWidth: 0,
